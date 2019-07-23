@@ -1,3 +1,5 @@
 # multiclientserver
 
-Python based multiclient server it is still not done but i have published this,so that others can use it and modify according to their needs :)
+Python based C2 server with a beacon which will route the traffic from attacker to victim and vice versa which keeps the attacker's ip safe from the victim :)
+
+![](c2-part2-2019-06-28_20.40.59.mp4)
